@@ -28,6 +28,22 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Users', layout: 'default' },
   },
   {
+    path: '/users/:id',
+    name: 'user-detail',
+    component: () => import('../views/UserDetailView.vue'),
+    props: true,
+    meta: { title: 'User details', layout: 'default' },
+    children: [
+      {
+        path: 'edit',
+        name: 'user-edit',
+        component: () => import('../views/UserEditView.vue'),
+        props: true,
+        meta: { title: 'Edit user', layout: 'default' },
+      },
+    ],
+  },
+  {
     path: '/login',
     name: 'login',
     component: () => import('../views/LoginView.vue'),

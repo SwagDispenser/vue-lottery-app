@@ -10,6 +10,12 @@ export interface UserCompany {
   department: string
   name: string
   title: string
+  address?: UserAddress
+}
+
+export interface UserHair {
+  color: string
+  type: string
 }
 
 export interface User {
@@ -25,6 +31,12 @@ export interface User {
   image?: string
   birthDate?: string
   maidenName?: string
+  bloodGroup?: string
+  height?: number
+  weight?: number
+  eyeColor?: string
+  hair?: UserHair
+  university?: string
   address?: UserAddress
   company?: UserCompany
   role?: string
