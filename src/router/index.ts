@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { pinia } from '@/stores/pinia'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -25,14 +27,14 @@ const routes: RouteRecordRaw[] = [
     path: '/users',
     name: 'users',
     component: () => import('../views/UsersView.vue'),
-    meta: { title: 'Users', layout: 'default' },
+    meta: { title: 'Users', layout: 'default', requiresAuth: true },
   },
   {
     path: '/users/:id',
     name: 'user-detail',
     component: () => import('../views/UserDetailView.vue'),
     props: true,
-    meta: { title: 'User details', layout: 'default' },
+    meta: { title: 'User details', layout: 'default', requiresAuth: true },
     children: [
       {
         path: 'edit',
@@ -61,6 +63,16 @@ export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
   scrollBehavior: () => ({ top: 0 }),
+})
+
+router.beforeEach(async (to) => {
+  const auth = useAuthStore(pinia)
+  if (to.meta.requiresAuth && !await auth.ensureAuthenticated()) {
+    return { name: 'login', query: { redirect: to.fullPath } }
+  }
+  if (to.name === 'login' && await auth.ensureAuthenticated()) {
+    return { name: 'users' }
+  }
 })
 
 router.afterEach((to) => {

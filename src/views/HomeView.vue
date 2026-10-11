@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import LotteryApp from '@/components/LotteryApp.vue'
 
-const technologies = ['Vue 3', 'Composition API', 'TypeScript', 'Vue Router', 'Bootstrap SCSS']
+const technologies = [
+  'Vue 3', 'Composition API', 'TypeScript', 'Vue Router', 'Pinia',
+  'VeeValidate', 'Yup', 'DummyJSON REST API', 'Bootstrap SCSS',
+]
 </script>
 
 <template>

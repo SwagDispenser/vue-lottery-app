@@ -98,4 +98,13 @@ async function remove(id: number): Promise<void> {
   revision.value += 1
 }
 
-export const userDirectory = { revision, list, getById, create, update, remove }
+function reset(): void {
+  createdUsers.clear()
+  updatedUsers.clear()
+  deletedUsers.clear()
+  cachedUsers.clear()
+  nextLocalId = -1
+  revision.value += 1
+}
+
+export const userDirectory = { revision, list, getById, create, update, remove, reset }

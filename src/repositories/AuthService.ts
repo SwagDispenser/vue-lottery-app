@@ -8,19 +8,19 @@ export class AuthService {
     return this.http.request<AuthSession>('/auth/login', {
       method: 'POST',
       body: credentials,
+      skipAuth: true,
     })
   }
 
-  me(accessToken: string): Promise<AuthUser> {
-    return this.http.request<AuthUser>('/auth/me', {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
+  me(): Promise<AuthUser> {
+    return this.http.request<AuthUser>('/auth/me')
   }
 
   refresh(refreshToken: string): Promise<AuthTokens> {
     return this.http.request<AuthTokens>('/auth/refresh', {
       method: 'POST',
       body: { refreshToken },
+      skipAuth: true,
     })
   }
 }
