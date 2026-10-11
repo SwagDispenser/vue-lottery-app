@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8">
+    <title>Перехід до Vue Lottery</title>
+    <script>
+      const pathParts = location.pathname.split('/').slice(1)
+      const basePath = `/${pathParts[0]}/`
+      const route = pathParts.slice(1).join('/') + location.search + location.hash
+
+      location.replace(`${basePath}?__spa_redirect=${encodeURIComponent(route)}`)
+    </script>
+  </head>
+  <body></body>
+</html>
