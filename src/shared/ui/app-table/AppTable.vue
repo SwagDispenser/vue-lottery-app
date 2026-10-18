@@ -19,6 +19,7 @@ withDefaults(defineProps<{
 
 defineSlots<{
   empty?(): unknown
+  [name: `header-${string}`]: (props: { column: AppTableColumn<TRow> }) => unknown
   [name: `cell-${string}`]: (props: { row: TRow; index: number }) => unknown
 }>()
 
@@ -42,8 +43,16 @@ function asRow(value: unknown): TRow {
         v-for="column in columns"
         :key="column.key"
         :field="column.field"
-        :header="column.header"
+        :header-props="{ 'aria-sort': column.sortOrder }"
       >
+        <template #header>
+          <slot
+            :name="`header-${column.key}`"
+            :column="column"
+          >
+            {{ column.header }}
+          </slot>
+        </template>
         <template #body="{ data, index }">
           <slot
             :name="`cell-${column.key}`"

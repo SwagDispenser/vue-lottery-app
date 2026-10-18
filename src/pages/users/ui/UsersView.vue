@@ -2,8 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
-import { AppButton } from '@/shared/ui'
-import { AppModal } from '@/shared/ui'
+import { AppButton, AppInput, AppModal, AppConfirmDialog, useNotification } from '@/shared/ui'
 import { UserForm } from '@/features/user-form'
 import { UsersTable } from '@/widgets/users-table'
 import { useUsersStore } from '@/entities/user'
@@ -13,6 +12,7 @@ const PAGE_SIZE = 10
 const route = useRoute()
 const router = useRouter()
 const store = useUsersStore()
+const notification = useNotification()
 const { users, total, isLoading: loading, error, isSaving: saving, mutationError } = storeToRefs(store)
 
 function queryValue(value: unknown): string {
@@ -89,10 +89,11 @@ async function createUser(input: CreateUserDto): Promise<void> {
   if (saving.value) return
   try {
     await store.createUser(input)
+    notification.success('Користувача створено.')
     createOpen.value = false
     if (page.value !== 1 || query.value) await router.push({ name: 'users' })
   } catch {
-    // Store передає помилку у форму; користувач може повторити операцію.
+    notification.error(store.mutationError || 'Не вдалося створити користувача.')
   }
 }
 
@@ -100,9 +101,10 @@ async function deleteUser(): Promise<void> {
   if (!deletingUser.value || saving.value) return
   try {
     await store.removeUser(deletingUser.value.id)
+    notification.success('Користувача видалено.')
     deletingUser.value = null
   } catch {
-    // При помилці підтвердження залишається відкритим, дані не видаляються.
+    notification.error(store.mutationError || 'Не вдалося видалити користувача.')
   }
 }
 </script>
@@ -127,15 +129,16 @@ async function deleteUser(): Promise<void> {
       </div>
     </div>
 
-    <label class="users-view__search">
-      <span>Пошук за іменем</span>
-      <input
+    <div class="users-view__search">
+      <AppInput
+        id="users-search"
         v-model="searchText"
-        class="form-control"
+        label="Пошук за іменем"
         type="search"
         placeholder="Введіть ім’я користувача"
-      >
-    </label>
+        :required="false"
+      />
+    </div>
 
     <p
       v-if="error"
@@ -183,6 +186,7 @@ async function deleteUser(): Promise<void> {
   <AppModal
     v-if="createOpen"
     title="Створити користувача"
+    :busy="saving"
     @close="createOpen = false"
   >
     <UserForm
@@ -193,35 +197,16 @@ async function deleteUser(): Promise<void> {
     />
   </AppModal>
 
-  <AppModal
+  <AppConfirmDialog
     v-if="deletingUser"
+    :open="true"
     title="Видалити користувача"
+    :message="`Видалити ${deletingUser.firstName} ${deletingUser.lastName} (${deletingUser.email})?`"
+    :busy="saving"
+    :error="mutationError"
+    @confirm="deleteUser"
     @close="deletingUser = null"
-  >
-    <p>Видалити {{ deletingUser.firstName }} {{ deletingUser.lastName }} ({{ deletingUser.email }})?</p>
-    <p
-      v-if="mutationError"
-      class="users-view__error"
-      role="alert"
-    >
-      {{ mutationError }}
-    </p>
-    <div class="users-view__confirm-actions">
-      <AppButton
-        variant="secondary"
-        @click="deletingUser = null"
-      >
-        Скасувати
-      </AppButton>
-      <AppButton
-        variant="danger"
-        :disabled="saving"
-        @click="deleteUser"
-      >
-        {{ saving ? 'Видалення…' : 'Так, видалити' }}
-      </AppButton>
-    </div>
-  </AppModal>
+  />
 </template>
 
 <style scoped lang="scss">
@@ -233,11 +218,10 @@ h1 { margin: 0 0 8px; font-size: 30px; font-weight: 700; }
 .users-view__subtitle { margin: 0; color: #71828a; }
 .users-view__count { padding: 7px 11px; border-radius: 3px; background: #eaf8fb; color: #087e99; white-space: nowrap; }
 .users-view__search { display: grid; gap: 7px; width: min(100%, 350px); margin: 30px 0 24px; font-weight: 600; }
-.users-view__search input { min-height: 38px; font-weight: 400; }
+.users-view__search :deep(.app-field) { margin-bottom: 0; }
 .users-view__state, .users-view__error { padding: 18px; border-radius: 4px; }
 .users-view__state { background: #eef8fb; color: #477080; }
 .users-view__error { border: 1px solid #f3c4c4; background: #fff4f4; color: #a43636; }
-.users-view__confirm-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 24px; }
 .users-view__pagination { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 22px; color: #65747b; }
 .users-view__pagination-actions { display: flex; gap: 8px; }
 @media (max-width: 620px) { .users-view { padding: 22px 18px; } .users-view__heading, .users-view__pagination { flex-wrap: wrap; } }

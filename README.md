@@ -81,4 +81,15 @@ PrimeVue 4 налаштовано у `app/providers/ui.ts`: preset Aura, вла�
 | `AppConfirmDialog` | Dialog; підтвердження/скасування, Esc і клік по фону, блокування закриття під час запиту, помилка операції |
 | `AppNotifications`, `useNotification` | Toast; одна область сповіщень у App.vue та методи `success`/`error` без залежності споживачів від API бібліотеки |
 
-Компоненти й composable PrimeVue імпортуються тільки у `shared/ui` та `app/providers/ui.ts`. Бізнес-типи не потрапляють у UI-обгортки. Поточні споживачі AppButton/AppInput уже отримують реалізацію PrimeVue; заміна таблиць і форм та виклики сповіщень після операцій — наступний крок міграції.
+Компоненти й composable PrimeVue імпортуються тільки у `shared/ui` та `app/providers/ui.ts`. Бізнес-типи не потрапляють у UI-обгортки. Форми входу й користувача інтегровані з AppInput через VeeValidate; таблиці Users та лотереї, підтвердження видалення й модальні форми використовують UI-обгортки.
+
+## Використання обгорток у застосунку
+
+- `features/auth/ui/LoginForm.vue`: AppInput + VeeValidate/Yup, інлайн-помилка авторизації та error toast; AppButton відображає loading. Logout використовує AppButton та очищення session store.
+- `features/user-form/ui/UserForm.vue`: спільна форма створення/редагування; AppInput для тексту, email, пароля, віку й телефону; унікальні id та зв’язки label/error. Обов’язковість, email, мінімальна довжина пароля й допустимий вік перевіряються Yup. Стать обирається нативним select з тією ж схемою валідації.
+- `widgets/users-table`: AppTable з типом рядка User, посиланнями деталей/редагування й AppButton для видалення. `pages/users` працює через useUsersStore, показує AppConfirmDialog, success/error toast та зберігає пошук/пагінацію у URL.
+- `pages/user-details/ui/UserEditView.vue`: оновлення через store, сповіщення про результат і повернення на профіль.
+- `widgets/lottery`: AppTable зі слотами заголовків для сортування, AppInput у SearchBar із debounce 300 мс, AppConfirmDialog при видаленні. Пошук, порядок сортування, localStorage учасників та правила вибору переможців збережено.
+- `shared/ui/app-modal`: PrimeVue Dialog керує фокусом, Esc, фоном і блокуванням скролу. Під час збереження форму не можна випадково закрити. Обидві таблиці мають горизонтальний скрол на вузьких екранах.
+
+Повідомлення результатів надсилаються через useNotification. Компоненти сторінок/віджетів не імпортують PrimeVue та не викликають сервіси; дані Users і сесія керуються Pinia stores. Імпорти Bootstrap скорочено до базових стилів root/reboot та їхніх SCSS-залежностей.

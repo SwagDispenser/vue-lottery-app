@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { useSessionStore } from '@/entities/session'
+import { AppButton } from '@/shared/ui'
 
 const auth = useSessionStore()
 const router = useRouter()
@@ -12,11 +13,10 @@ async function logout(): Promise<void> {
 </script>
 
 <template>
-  <button
-    class="navigation__link navigation__logout"
-    type="button"
+  <AppButton
+    variant="ghost"
     @click="logout"
   >
     Logout
-  </button>
+  </AppButton>
 </template>

@@ -3,7 +3,7 @@ import { LotteryApp } from '@/widgets/lottery'
 
 const technologies = [
   'Vue 3', 'Composition API', 'TypeScript', 'Vue Router', 'Pinia',
-  'VeeValidate', 'Yup', 'DummyJSON REST API', 'Bootstrap SCSS',
+  'VeeValidate', 'Yup', 'DummyJSON REST API', 'PrimeVue', 'FSD', 'SCSS',
 ]
 </script>
 
@@ -22,7 +22,7 @@ const technologies = [
       <p class="home-intro__description">
         Інтерактивний застосунок для реєстрації учасників, пошуку, редагування даних
         і випадкового вибору до трьох переможців. У цьому розділі працює початкова
-        лотерея; сторінка Users використовуватиме окреме REST API.
+        лотерея; сторінка Users працює з окремим REST API DummyJSON.
       </p>
       <ul
         class="home-intro__technologies"

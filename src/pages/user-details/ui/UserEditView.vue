@@ -3,12 +3,14 @@ import { computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
 import { UserForm } from '@/features/user-form'
+import { useNotification } from '@/shared/ui'
 import { useUsersStore, type CreateUserDto } from '@/entities/user'
 
 const props = defineProps<{ id: string }>()
 const route = useRoute()
 const router = useRouter()
 const store = useUsersStore()
+const notification = useNotification()
 const { selectedUser, isLoadingUser: loading, isSaving: saving, mutationError: error } = storeToRefs(store)
 const user = computed(() => selectedUser.value?.id === Number(props.id) ? selectedUser.value : null)
 
@@ -18,9 +20,10 @@ async function save(input: CreateUserDto): Promise<void> {
   if (!user.value || saving.value) return
   try {
     const updated = await store.updateUser(user.value.id, input)
+    notification.success('Користувача оновлено.')
     await router.push({ name: 'user-detail', params: { id: updated.id }, query: route.query })
   } catch {
-    // Текст помилки зберігає store; форма залишається відкритою для повторної спроби.
+    notification.error(store.mutationError || 'Не вдалося оновити користувача.')
   }
 }
 </script>

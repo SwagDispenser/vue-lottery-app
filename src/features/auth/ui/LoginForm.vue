@@ -5,13 +5,14 @@ import { useRoute, useRouter } from 'vue-router'
 import { toTypedSchema } from '@vee-validate/yup'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
-import { AppButton } from '@/shared/ui'
+import { AppButton, AppInput, useNotification } from '@/shared/ui'
 import { ApiError } from '@/shared/api'
 import { useSessionStore } from '@/entities/session'
 
 const route = useRoute()
 const router = useRouter()
 const auth = useSessionStore()
+const notification = useNotification()
 const { storageError } = storeToRefs(auth)
 const loading = ref(false)
 const loginError = ref('')
@@ -42,6 +43,7 @@ const submit = handleSubmit(async (credentials) => {
     loginError.value = cause instanceof ApiError && [400, 401].includes(cause.status)
       ? 'Неправильний username або пароль.'
       : cause instanceof Error ? cause.message : 'Не вдалося увійти. Спробуйте ще раз.'
+    notification.error(loginError.value)
   } finally {
     loading.value = false
   }
@@ -63,30 +65,25 @@ const submit = handleSubmit(async (credentials) => {
       novalidate
       @submit="submit"
     >
-      <label>
-        <span>Username</span>
-        <input
-          v-model="username"
-          v-bind="usernameAttrs"
-          class="form-control"
-          type="text"
-          autocomplete="username"
-          :aria-invalid="Boolean(errors.username)"
-        >
-        <small v-if="errors.username">{{ errors.username }}</small>
-      </label>
-      <label>
-        <span>Пароль</span>
-        <input
-          v-model="password"
-          v-bind="passwordAttrs"
-          class="form-control"
-          type="password"
-          autocomplete="current-password"
-          :aria-invalid="Boolean(errors.password)"
-        >
-        <small v-if="errors.password">{{ errors.password }}</small>
-      </label>
+      <AppInput
+        id="login-username"
+        v-model="username"
+        v-bind="usernameAttrs"
+        label="Username"
+        autocomplete="username"
+        :error="errors.username"
+        :disabled="loading"
+      />
+      <AppInput
+        id="login-password"
+        v-model="password"
+        v-bind="passwordAttrs"
+        label="Пароль"
+        type="password"
+        autocomplete="current-password"
+        :error="errors.password"
+        :disabled="loading"
+      />
 
       <p
         v-if="loginError || storageError"
@@ -97,7 +94,7 @@ const submit = handleSubmit(async (credentials) => {
       </p>
       <AppButton
         type="submit"
-        :disabled="loading"
+        :loading="loading"
       >
         {{ loading ? 'Вхід…' : 'Login' }}
       </AppButton>
@@ -114,10 +111,8 @@ const submit = handleSubmit(async (credentials) => {
 h1 { margin: 0 0 9px; font-size: 30px; font-weight: 700; }
 .login-view__intro { margin: 0; color: #64757c; line-height: 1.6; }
 .login-view__form { display: grid; gap: 18px; margin-top: 28px; }
-.login-view__form label { display: grid; gap: 7px; font-weight: 600; }
-.login-view__form input { min-height: 40px; font-weight: 400; }
-.login-view__form small, .login-view__error { color: #bd3434; font-size: 12px; font-weight: 400; }
-.login-view__form [aria-invalid="true"] { border-color: #d9534f; }
-.login-view__form button { justify-self: end; min-width: 100px; }
+.login-view__error { color: #bd3434; font-size: 12px; font-weight: 400; }
+.login-view__form :deep(.app-field) { margin-bottom: 0; }
+.login-view__form :deep(.app-button) { justify-self: end; min-width: 100px; }
 .login-view__hint { margin: 24px 0 0; color: #829197; font-size: 12px; }
 </style>
