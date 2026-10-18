@@ -13,9 +13,12 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@primeuix/themes": "^1.2.5",
     "@vee-validate/yup": "^4.15.1",
     "bootstrap": "^5.3.8",
     "pinia": "^4.0.3",
+    "pinia-plugin-persistedstate": "^4.7.1",
+    "primevue": "^4.5.5",
     "vee-validate": "^4.15.1",
     "vue": "^3.5.42",
     "vue-router": "^5.4.0",
@@ -27,6 +30,8 @@
     "@vitejs/plugin-vue": "^6.0.8",
     "@vue/tsconfig": "^0.9.1",
     "eslint": "^10.12.0",
+    "eslint-import-resolver-typescript": "^4.4.5",
+    "eslint-plugin-boundaries": "^7.2.0",
     "eslint-plugin-vue": "^10.11.1",
     "npm-run-all2": "^9.0.3",
     "sass": "^1.105.1",
@@ -39,5 +44,8 @@
   },
   "engines": {
     "node": "^22.18.0 || >=24.12.0"
+  },
+  "overrides": {
+    "handlebars": "4.7.10"
   }
 }
