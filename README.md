@@ -66,3 +66,19 @@ flowchart TD
 - `app/providers/session.ts` налаштовує HTTP-авторизацію та очищає Users при зміні користувача сесії. Сутності `session` та `user` не імпортують одна одну.
 
 Ручне збереження сесії (`watch`, `JSON.stringify`, перевірка JSON при відновленні, обробка помилок сховища) залишено в `session.store.ts`. Інтеграція `pinia-plugin-persistedstate` для налаштувань теми буде окремим етапом; одночасно два механізми для сесії не застосовуються.
+
+## UI-обгортки PrimeVue
+
+PrimeVue 4 налаштовано у `app/providers/ui.ts`: preset Aura, власна бірюзова палітра, ToastService, українські підписи закриття. Темна палітра компонентів прив’язана до класу `.app-dark`; перемикач буде підключено окремо. Стилі бібліотеки додаються для використаних компонентів, глобальної реєстрації всіх компонентів немає.
+
+Публічний API — `shared/ui/index.ts`:
+
+| Обгортка | Компонент PrimeVue та призначення |
+| --- | --- |
+| `AppButton` | Button; варіанти primary/secondary/danger/ghost, loading, disabled, slot/label |
+| `AppInput` | InputText; `v-model`, label, типи полів (зокрема date/password/number), текст помилки, `aria-invalid` і зв’язок з помилкою через `aria-describedby`; передає blur/change для VeeValidate |
+| `AppTable<TRow>` | DataTable + Column; типізовані rows/columns, унікальний rowKey, слоти `cell-<key>`, loading та порожній стан |
+| `AppConfirmDialog` | Dialog; підтвердження/скасування, Esc і клік по фону, блокування закриття під час запиту, помилка операції |
+| `AppNotifications`, `useNotification` | Toast; одна область сповіщень у App.vue та методи `success`/`error` без залежності споживачів від API бібліотеки |
+
+Компоненти й composable PrimeVue імпортуються тільки у `shared/ui` та `app/providers/ui.ts`. Бізнес-типи не потрапляють у UI-обгортки. Поточні споживачі AppButton/AppInput уже отримують реалізацію PrimeVue; заміна таблиць і форм та виклики сповіщень після операцій — наступний крок міграції.

@@ -1,41 +1,66 @@
 <script setup lang="ts">
-withDefaults(defineProps<{
-  type?: 'button' | 'submit'
+import { computed } from 'vue'
+import Button from 'primevue/button'
+
+const props = withDefaults(defineProps<{
+  type?: 'button' | 'submit' | 'reset'
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost'
+  label?: string
   disabled?: boolean
+  loading?: boolean
 }>(), {
   type: 'button',
   variant: 'primary',
+  label: undefined,
   disabled: false,
+  loading: false,
+})
+
+const severity = computed(() => {
+  if (props.variant === 'secondary' || props.variant === 'danger') return props.variant
+  return undefined
 })
 </script>
 
 <template>
-  <button
-    class="btn app-button"
+  <Button
+    class="app-button"
     :class="`app-button--${variant}`"
     :type="type"
-    :disabled="disabled"
+    :severity="severity"
+    :text="variant === 'ghost'"
+    :label="label"
+    :disabled="disabled || loading"
+    :loading="loading"
+    :aria-busy="loading"
   >
-    <slot />
-  </button>
+    <span
+      v-if="loading"
+      class="app-button__spinner"
+      aria-hidden="true"
+    />
+    <slot>{{ label }}</slot>
+  </Button>
 </template>
 
 <style scoped lang="scss">
 .app-button {
-  border-radius: 3px;
+  font-family: inherit;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.35;
-  padding: 8px 16px;
   white-space: nowrap;
 
-  &--primary { background: #00acd2; border-color: #00acd2; color: #fff; }
-  &--primary:hover:not(:disabled) { background: #008eae; border-color: #008eae; color: #fff; }
-  &--secondary { background: #eef3f5; border-color: #dce5e8; color: #34454b; }
-  &--danger { background: #d9534f; border-color: #d9534f; color: #fff; }
-  &--ghost { background: transparent; border-color: transparent; color: #008fad; padding: 5px 8px; }
-  &--ghost:hover:not(:disabled) { background: #e9f8fb; color: #007a95; }
+  &__spinner {
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: app-button-spin .7s linear infinite;
+  }
+  &--ghost { padding: 5px 8px; }
   &:disabled { cursor: not-allowed; opacity: .5; }
 }
+@keyframes app-button-spin { to { transform: rotate(360deg); } }
 </style>
