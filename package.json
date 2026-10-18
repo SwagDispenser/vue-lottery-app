@@ -10,7 +10,8 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "lint": "eslint src",
-    "test": "vitest run"
+    "test": "vitest run",
+    "lint:fsd": "eslint src --config eslint.fsd.config.js --max-warnings 0"
   },
   "dependencies": {
     "@primeuix/themes": "^1.2.5",

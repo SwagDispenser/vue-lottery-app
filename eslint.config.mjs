@@ -1,3 +1,4 @@
+import { fsdConfig } from './eslint.fsd.config.js'
 import pluginVue from 'eslint-plugin-vue'
 import tseslint from 'typescript-eslint'
 import vueParser from 'vue-eslint-parser'
@@ -6,6 +7,7 @@ export default [
   { ignores: ['dist/**', 'node_modules/**', '.idea/**'] },
   ...pluginVue.configs['flat/recommended'],
   ...tseslint.configs.recommended,
+  fsdConfig,
   {
     files: ['**/*.vue'],
     languageOptions: {

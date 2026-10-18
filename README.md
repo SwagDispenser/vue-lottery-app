@@ -18,6 +18,7 @@ npm run dev
 
 ```sh
 npm run lint
+npm run lint:fsd
 npm test
 npm run build
 ```
@@ -113,3 +114,33 @@ PrimeVue 4 налаштовано у `app/providers/ui.ts`: preset Aura, вла�
 | Очищення | clearSession видаляє ключ авторизації | Тема не скидається при Logout |
 
 Плагін підключений один раз, але зберігає лише stores із `persist`. Users не зберігається ним у localStorage. Сесія продовжує працювати через ручну реалізацію; налаштування теми не містить токенів або профілю.
+
+## Перевірка архітектури FSD
+
+`eslint.fsd.config.js` налаштовує eslint-plugin-boundaries 7 через актуальне правило `boundaries/dependencies`. `eslint.config.mjs` підключає ту саму конфігурацію, тому FSD-помилки видно і під час звичайного `npm run lint`, і в редакторі. `npm run lint:fsd` окремо перевіряє архітектуру без попереджень.
+
+| Звідки | Дозволені зовнішні залежності проєкту |
+| --- | --- |
+| app | pages, widgets, features, entities, shared |
+| pages | widgets, features, entities, shared |
+| widgets | features, entities, shared |
+| features | entities, shared |
+| entities | shared |
+| shared | інші сегменти shared |
+
+- Кожен слайс pages/widgets/features/entities класифіковано як окремий елемент. Усередині нього можна імпортувати власні файли; імпорт іншого слайса того ж шару заборонений.
+- app — єдиний елемент без слайсів. Сегменти shared мають власні Public API: для міжсегментних залежностей потрібен index.ts.
+- Усі дозволені залежності між елементами проходять тільки через index.ts. Заборона глибоких імпортів стосується alias @, відносних шляхів, import type, export from та динамічного import().
+- Невідомі локальні залежності та файли поза визначеною структурою — помилки. TypeScript resolver використовує tsconfig.app.json і розпізнає @ → src, .ts та .vue. Нерозпізнаний @/... не отримує дозволу npm-пакета.
+- Прямі імпорти primevue, @primevue та @primeuix дозволені лише у shared/ui та app/providers/ui.ts.
+- `tests/fsdLint.test.ts` перевіряє дозволені/заборонені приклади через реальний ESLint і наявність index.ts у кожного слайса/сегмента shared. Тести аналізують текст у пам’яті та не додають порушень до src.
+- `.github/workflows/check-fsd.yml` виконує ESLint, lint:fsd, тести та збірку при push у feature/fsd і для pull request. Результат GitHub Actions з’явиться після push; цей workflow нічого не публікує на Pages.
+
+Локальний порядок перевірки перед комітом:
+
+```sh
+npm run lint
+npm run lint:fsd
+npm test
+npm run build
+```
