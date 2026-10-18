@@ -56,5 +56,5 @@ const columns: AppTableColumn<User>[] = [
 .users-table__actions { display: flex; align-items: center; gap: 8px; }
 .users-table__actions a { padding: 5px 8px; color: var(--p-primary-color, #0088a6); font-size: 12px; font-weight: 600; text-decoration: none; white-space: nowrap; }
 .users-table__actions a:hover { text-decoration: underline; }
-.users-table__delete { color: var(--p-red-600, #c13f3f); font-size: 12px; }
+.users-table__delete { color: var(--app-error-text); font-size: 12px; }
 </style>

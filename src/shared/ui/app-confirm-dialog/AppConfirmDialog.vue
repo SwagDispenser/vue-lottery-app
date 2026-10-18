@@ -72,5 +72,5 @@ const descriptionId = useId()
 
 <style scoped lang="scss">
 .app-confirm-dialog__message { margin: 0; overflow-wrap: anywhere; line-height: 1.6; }
-.app-confirm-dialog__error { margin: 14px 0 0; color: var(--p-red-600, #bd3434); }
+.app-confirm-dialog__error { margin: 14px 0 0; color: var(--app-error-text); }
 </style>

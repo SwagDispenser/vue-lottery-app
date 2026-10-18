@@ -36,8 +36,8 @@ DummyJSON імітує POST, PUT і DELETE: після відповіді API з
 flowchart TD
     app[app: запуск, роутер, провайдери, layouts, стилі] --> pages[pages: сторінки маршрутів]
     pages --> widgets[widgets: шапка, таблиця Users, лотерея]
-    widgets --> features[features: вхід, вихід, форма користувача]
-    features --> entities[entities: user, session, participant]
+    widgets --> features[features: вхід, вихід, форма користувача, тема]
+    features --> entities[entities: user, session, participant, settings]
     entities --> shared[shared: API-інфраструктура та UI]
 ```
 
@@ -65,11 +65,11 @@ flowchart TD
 - Пошук і номер сторінки залишаються у query-параметрах URL. Store відповідає за дані, а сторінка — за синхронізацію маршруту.
 - `app/providers/session.ts` налаштовує HTTP-авторизацію та очищає Users при зміні користувача сесії. Сутності `session` та `user` не імпортують одна одну.
 
-Ручне збереження сесії (`watch`, `JSON.stringify`, перевірка JSON при відновленні, обробка помилок сховища) залишено в `session.store.ts`. Інтеграція `pinia-plugin-persistedstate` для налаштувань теми буде окремим етапом; одночасно два механізми для сесії не застосовуються.
+Ручне збереження сесії (`watch`, `JSON.stringify`, перевірка JSON при відновленні, обробка помилок сховища) залишено в `session.store.ts`. `pinia-plugin-persistedstate` підключено для налаштувань теми; одночасно два механізми для сесії не застосовуються.
 
 ## UI-обгортки PrimeVue
 
-PrimeVue 4 налаштовано у `app/providers/ui.ts`: preset Aura, власна бірюзова палітра, ToastService, українські підписи закриття. Темна палітра компонентів прив’язана до класу `.app-dark`; перемикач буде підключено окремо. Стилі бібліотеки додаються для використаних компонентів, глобальної реєстрації всіх компонентів немає.
+PrimeVue 4 налаштовано у `app/providers/ui.ts`: preset Aura, власна бірюзова палітра, ToastService, українські підписи закриття. Темна палітра компонентів прив’язана до класу `.app-dark`, який перемикається разом зі станом settings store. Стилі бібліотеки додаються для використаних компонентів, глобальної реєстрації всіх компонентів немає.
 
 Публічний API — `shared/ui/index.ts`:
 
@@ -93,3 +93,23 @@ PrimeVue 4 налаштовано у `app/providers/ui.ts`: preset Aura, вла�
 - `shared/ui/app-modal`: PrimeVue Dialog керує фокусом, Esc, фоном і блокуванням скролу. Під час збереження форму не можна випадково закрити. Обидві таблиці мають горизонтальний скрол на вузьких екранах.
 
 Повідомлення результатів надсилаються через useNotification. Компоненти сторінок/віджетів не імпортують PrimeVue та не викликають сервіси; дані Users і сесія керуються Pinia stores. Імпорти Bootstrap скорочено до базових стилів root/reboot та їхніх SCSS-залежностей.
+
+## Світла й темна тема та persistedstate
+
+- `entities/settings/model/settings.store.ts`: setup store `useSettingsStore`, тип Theme (`light` / `dark`), getter `isDark`, дії `setTheme` і `toggleTheme`. За замовчуванням тема світла.
+- `features/theme/ui/ThemeToggle.vue`: перемикач через AppButton та storeToRefs. Є у шапці й AuthLayout (сторінка Login); має зрозумілий текст дії та `aria-pressed`.
+- `app/providers/pinia`: реєстрація pinia-plugin-persistedstate. Опція `persist` у settings store зберігає тільки `theme` (`pick`) у ключі `vue-lottery-settings`. Плагін сам відновлює значення при створенні store і зберігає наступні зміни. Serializer перевіряє значення; некоректний JSON перехоплює плагін, і залишається початкова світла тема.
+- `app/providers/theme.ts`: перед mount підписується на тему, синхронно перемикає `.app-dark` для PrimeVue та `data-bs-theme` для базових Bootstrap-стилів.
+- `app/styles/main.scss`: CSS-змінні для фону, поверхонь, тексту, меж, акцентів і помилок. Ними користуються сторінки, шапка, лотерея та повідомлення форм. Нативні поля дати враховують `color-scheme`.
+
+### Порівняння двох способів збереження
+
+| Ознака | Ручний session.store.ts | settings.store.ts + persistedstate |
+| --- | --- | --- |
+| Збереження | Власний watch, JSON.stringify, setItem/removeItem | Плагін підписується на зміни стану |
+| Відновлення | Явний restoreSession, перевірка токенів і профілю | Автоматичне при створенні store; serializer перевіряє theme |
+| Вибір полів | Об’єкт із токенами та безпечними полями профілю | Декларативне pick: ['theme'] |
+| Помилки сховища | Власні try/catch та storageError у формі | Плагін перехоплює помилки; налаштування далі діє у пам’яті |
+| Очищення | clearSession видаляє ключ авторизації | Тема не скидається при Logout |
+
+Плагін підключений один раз, але зберігає лише stores із `persist`. Users не зберігається ним у localStorage. Сесія продовжує працювати через ручну реалізацію; налаштування теми не містить токенів або профілю.

@@ -83,6 +83,6 @@ function update(value: string | undefined): void {
 
   &__label { display: block; margin-bottom: 4px; font-weight: 600; }
   &__input { width: 100%; min-height: 35px; font-family: inherit; font-size: 14px; }
-  &__error { display: block; margin-top: 4px; color: var(--p-red-600, #bd3434); font-size: 12px; }
+  &__error { display: block; margin-top: 4px; color: var(--app-error-text); font-size: 12px; }
 }
 </style>

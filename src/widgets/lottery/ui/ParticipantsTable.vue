@@ -115,6 +115,6 @@ function sortBy(key: SortKey): void {
 <style scoped lang="scss">
 .participants-panel { padding: 20px; }
 .participants-panel__toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 18px; }
-.participants-panel__count { color: #95a2a8; font-size: 12px; }
+.participants-panel__count { color: var(--app-subtle); font-size: 12px; }
 .participants-table__actions { display: flex; gap: 4px; white-space: nowrap; }
 </style>

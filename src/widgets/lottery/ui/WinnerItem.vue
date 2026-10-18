@@ -21,8 +21,8 @@ const emit = defineEmits<{ remove: [id: string] }>()
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  background: #00acd2;
-  color: #fff;
+  background: var(--app-accent);
+  color: var(--app-on-accent);
   border-radius: 2px;
   font-size: 12px;
   font-weight: 600;
@@ -31,6 +31,6 @@ const emit = defineEmits<{ remove: [id: string] }>()
   white-space: nowrap;
 
   button { border: 0; padding: 0; background: transparent; color: inherit; font-size: 16px; line-height: 1; }
-  button:hover { color: #d7f7ff; }
+  button:hover { opacity: .75; }
 }
 </style>

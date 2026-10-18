@@ -61,6 +61,6 @@ async function save(input: CreateUserDto): Promise<void> {
 </template>
 
 <style scoped lang="scss">
-.user-edit { padding-top: 28px; border-top: 1px solid #e8edef; }
+.user-edit { padding-top: 28px; border-top: 1px solid var(--app-border); }
 .user-edit h2 { margin: 0 0 20px; font-size: 20px; }
 </style>

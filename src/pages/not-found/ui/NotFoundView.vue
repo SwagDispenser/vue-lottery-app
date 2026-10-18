@@ -17,9 +17,9 @@ import { RouterLink } from 'vue-router'
 
 <style scoped lang="scss">
 .not-found { max-width: 680px; padding: 44px 32px; text-align: center; }
-.not-found__code { margin: 0; color: #00acd2; font-size: 64px; font-weight: 800; line-height: 1; }
+.not-found__code { margin: 0; color: var(--app-accent); font-size: 64px; font-weight: 800; line-height: 1; }
 h1 { margin: 14px 0 10px; font-size: 28px; font-weight: 700; }
-p { color: #64757c; }
-a { display: inline-block; margin-top: 14px; color: #008fad; font-weight: 700; text-decoration: none; }
+p { color: var(--app-muted); }
+a { display: inline-block; margin-top: 14px; color: var(--app-accent); font-weight: 700; text-decoration: none; }
 a:hover { text-decoration: underline; }
 </style>

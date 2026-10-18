@@ -22,7 +22,7 @@ defineOptions({ name: 'AppLogo' })
         width="38"
         height="38"
         rx="11"
-        fill="#00acd2"
+        fill="var(--app-accent)"
       />
       <circle
         cx="15"
@@ -49,7 +49,7 @@ defineOptions({ name: 'AppLogo' })
 </template>
 
 <style scoped lang="scss">
-.brand { display: inline-flex; align-items: center; gap: 10px; color: #263238; text-decoration: none; font-size: 18px; white-space: nowrap; }
+.brand { display: inline-flex; align-items: center; gap: 10px; color: var(--app-text); text-decoration: none; font-size: 18px; white-space: nowrap; }
 .brand__mark { width: 40px; height: 40px; flex: none; }
-.brand strong { color: #008fad; }
+.brand strong { color: var(--app-accent); }
 </style>

@@ -201,9 +201,9 @@ const submit = handleSubmit((values) => emit('save', values))
   font: inherit;
 }
 .user-form__select-field select:focus { outline: 2px solid var(--p-primary-color, #0088a6); outline-offset: 1px; }
-.user-form__select-field [aria-invalid="true"] { border-color: var(--p-red-600, #bd3434); }
-.user-form__select-field small { color: var(--p-red-600, #bd3434); font-size: 12px; }
-.user-form__server-error { margin: 20px 0 0; color: #ad3434; }
+.user-form__select-field [aria-invalid="true"] { border-color: var(--app-error-text); }
+.user-form__select-field small { color: var(--app-error-text); font-size: 12px; }
+.user-form__server-error { margin: 20px 0 0; color: var(--app-error-text); }
 .user-form__actions { display: flex; justify-content: flex-end; margin-top: 24px; }
 @media (max-width: 580px) { .user-form__grid { grid-template-columns: 1fr; } }
 </style>

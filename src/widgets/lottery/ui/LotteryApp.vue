@@ -144,6 +144,6 @@ function deleteParticipant(): void {
 <style scoped lang="scss">
 .lottery-app { width: min(100%, 802px); margin: 28px auto 80px; }
 .lottery-app > :not(:last-child) { margin-bottom: 18px; }
-.lottery-app__error { padding: 10px 14px; border: 1px solid #f3c4c4; border-radius: 4px; color: #a43636; background: #fff4f4; }
+.lottery-app__error { padding: 10px 14px; border: 1px solid var(--app-error-border); border-radius: 4px; color: var(--app-error-text); background: var(--app-error-bg); }
 @media (max-width: 700px) { .lottery-app { margin-top: 32px; } }
 </style>

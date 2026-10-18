@@ -116,17 +116,17 @@ watch(() => props.id, async (rawId, _previous, onCleanup) => {
 
 <style scoped lang="scss">
 .user-detail { max-width: 850px; padding: 30px 32px; }
-.user-detail__back { color: #008fad; font-weight: 600; text-decoration: none; }
+.user-detail__back { color: var(--app-accent); font-weight: 600; text-decoration: none; }
 .user-detail__heading { display: flex; align-items: center; gap: 20px; margin: 24px 0; }
-.user-detail__heading img { border-radius: 50%; background: #eaf8fb; object-fit: cover; }
-.user-detail__eyebrow { margin: 0 0 5px; color: #008fad; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+.user-detail__heading img { border-radius: 50%; background: var(--app-tint); object-fit: cover; }
+.user-detail__eyebrow { margin: 0 0 5px; color: var(--app-accent); font-size: 12px; font-weight: 700; text-transform: uppercase; }
 h1 { margin: 0 0 5px; font-size: 30px; }
-.user-detail__heading p:last-child { margin: 0; color: #7b8b91; }
+.user-detail__heading p:last-child { margin: 0; color: var(--app-subtle); }
 .user-detail__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin: 0 0 26px; }
-.user-detail__facts div { padding: 16px; border: 1px solid #e8edef; border-radius: 4px; }
-.user-detail__facts dt { margin-bottom: 5px; color: #809096; font-size: 12px; text-transform: uppercase; }
+.user-detail__facts div { padding: 16px; border: 1px solid var(--app-border); border-radius: 4px; }
+.user-detail__facts dt { margin-bottom: 5px; color: var(--app-subtle); font-size: 12px; text-transform: uppercase; }
 .user-detail__facts dd { margin: 0; overflow-wrap: anywhere; font-weight: 600; }
-.user-detail__error { color: #b03b3b; }
-.user-detail__edit { display: inline-block; padding: 9px 15px; border-radius: 3px; background: #00acd2; color: #fff; font-weight: 600; text-decoration: none; }
+.user-detail__error { color: var(--app-error-text); }
+.user-detail__edit { display: inline-block; padding: 9px 15px; border-radius: 3px; background: var(--app-accent); color: var(--app-on-accent); font-weight: 600; text-decoration: none; }
 @media (max-width: 620px) { .user-detail { padding: 22px 18px; } .user-detail__facts { grid-template-columns: 1fr; } }
 </style>

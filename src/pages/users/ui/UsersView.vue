@@ -213,16 +213,16 @@ async function deleteUser(): Promise<void> {
 .users-view { padding: 30px 32px; }
 .users-view__heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
 .users-view__heading-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.users-view__eyebrow { margin: 0 0 6px; color: #008fad; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.users-view__eyebrow { margin: 0 0 6px; color: var(--app-accent); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 h1 { margin: 0 0 8px; font-size: 30px; font-weight: 700; }
-.users-view__subtitle { margin: 0; color: #71828a; }
-.users-view__count { padding: 7px 11px; border-radius: 3px; background: #eaf8fb; color: #087e99; white-space: nowrap; }
+.users-view__subtitle { margin: 0; color: var(--app-muted); }
+.users-view__count { padding: 7px 11px; border-radius: 3px; background: var(--app-tint); color: var(--app-accent); white-space: nowrap; }
 .users-view__search { display: grid; gap: 7px; width: min(100%, 350px); margin: 30px 0 24px; font-weight: 600; }
 .users-view__search :deep(.app-field) { margin-bottom: 0; }
 .users-view__state, .users-view__error { padding: 18px; border-radius: 4px; }
-.users-view__state { background: #eef8fb; color: #477080; }
-.users-view__error { border: 1px solid #f3c4c4; background: #fff4f4; color: #a43636; }
-.users-view__pagination { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 22px; color: #65747b; }
+.users-view__state { background: var(--app-tint); color: var(--app-muted); }
+.users-view__error { border: 1px solid var(--app-error-border); background: var(--app-error-bg); color: var(--app-error-text); }
+.users-view__pagination { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 22px; color: var(--app-muted); }
 .users-view__pagination-actions { display: flex; gap: 8px; }
 @media (max-width: 620px) { .users-view { padding: 22px 18px; } .users-view__heading, .users-view__pagination { flex-wrap: wrap; } }
 </style>

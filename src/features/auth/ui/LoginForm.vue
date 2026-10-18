@@ -107,12 +107,12 @@ const submit = handleSubmit(async (credentials) => {
 </template>
 
 <style scoped lang="scss">
-.login-view__eyebrow { margin: 0 0 7px; color: #008fad; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.login-view__eyebrow { margin: 0 0 7px; color: var(--app-accent); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 h1 { margin: 0 0 9px; font-size: 30px; font-weight: 700; }
-.login-view__intro { margin: 0; color: #64757c; line-height: 1.6; }
+.login-view__intro { margin: 0; color: var(--app-muted); line-height: 1.6; }
 .login-view__form { display: grid; gap: 18px; margin-top: 28px; }
-.login-view__error { color: #bd3434; font-size: 12px; font-weight: 400; }
+.login-view__error { color: var(--app-error-text); font-size: 12px; font-weight: 400; }
 .login-view__form :deep(.app-field) { margin-bottom: 0; }
 .login-view__form :deep(.app-button) { justify-self: end; min-width: 100px; }
-.login-view__hint { margin: 24px 0 0; color: #829197; font-size: 12px; }
+.login-view__hint { margin: 24px 0 0; color: var(--app-subtle); font-size: 12px; }
 </style>

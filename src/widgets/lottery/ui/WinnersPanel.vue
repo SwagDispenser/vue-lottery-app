@@ -49,9 +49,9 @@ const emit = defineEmits<{
   min-height: 38px;
   gap: 5px;
   padding: 6px 10px;
-  border: 1px solid #dedede;
+  border: 1px solid var(--app-border);
   border-radius: 4px;
 }
-.winners-panel__placeholder { color: #999; font-size: 14px; margin-left: 3px; }
+.winners-panel__placeholder { color: var(--app-subtle); font-size: 14px; margin-left: 3px; }
 @media (max-width: 520px) { .winners-panel { align-items: stretch; flex-direction: column; gap: 12px; } }
 </style>
