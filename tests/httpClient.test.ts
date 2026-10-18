@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { HttpClient } from '../src/api/httpClient'
+import { HttpClient } from '../src/shared/api'
 
 afterEach(() => vi.unstubAllGlobals())
 
