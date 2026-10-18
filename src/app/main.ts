@@ -2,10 +2,12 @@ import './styles/main.scss'
 
 import { createApp } from 'vue'
 import App from './App.vue'
-import { httpClient } from '@/shared/api'
+import { httpClient, registerServices } from './providers/services'
 import { router } from './providers/router'
 import { useAuthStore } from '@/entities/session'
 import { pinia } from './providers/pinia'
+
+registerServices()
 
 const app = createApp(App)
 app.use(pinia)

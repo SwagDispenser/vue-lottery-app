@@ -1,10 +1,15 @@
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
-import { services } from '@/shared/api'
+import { ServiceProvider } from '@/shared/api'
+import type { AuthService } from '../api/auth.service'
 import { userDirectory } from '@/entities/user'
 import type { AuthSession, AuthUser, LoginDto } from './types'
 
 const STORAGE_KEY = 'vue-lottery-auth'
+
+function service(): AuthService {
+  return ServiceProvider.get<AuthService>('auth')
+}
 
 function profileFromSession(session: AuthSession): AuthUser {
   return {
@@ -82,7 +87,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function refreshAccessToken(): Promise<string | null> {
     if (!refreshToken.value) return null
-    const tokens = await services.auth.refresh(refreshToken.value)
+    const tokens = await service().refresh(refreshToken.value)
     accessToken.value = tokens.accessToken
     refreshToken.value = tokens.refreshToken
     return tokens.accessToken
@@ -92,7 +97,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (!isAuthenticated.value) return false
     if (verified.value) return true
     if (!verificationInFlight) {
-      verificationInFlight = services.auth.me()
+      verificationInFlight = service().me()
         .then((profile) => {
           user.value = profile
           verified.value = true
@@ -108,7 +113,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function login(credentials: LoginDto): Promise<void> {
-    const session = await services.auth.login(credentials)
+    const session = await service().login(credentials)
     accessToken.value = session.accessToken
     refreshToken.value = session.refreshToken
     user.value = profileFromSession(session)

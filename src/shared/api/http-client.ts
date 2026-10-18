@@ -81,5 +81,3 @@ export class HttpClient {
     return this.refreshInFlight
   }
 }
-
-export const httpClient = new HttpClient(import.meta.env.VITE_API_URL)

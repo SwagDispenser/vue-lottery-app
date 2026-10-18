@@ -1,6 +1,6 @@
 import { ref } from 'vue'
-import { services } from '@/shared/api'
-import type { ListOptions, Page } from '@/shared/api'
+import { ServiceProvider, type ListOptions, type Page } from '@/shared/api'
+import type { UserService } from '../api/user.service'
 import type { CreateUserDto, UpdateUserDto, User } from './types'
 
 const createdUsers = new Map<number, User>()
@@ -10,6 +10,10 @@ const cachedUsers = new Map<number, User>()
 const revision = ref(0)
 let nextLocalId = -1
 
+function service(): UserService {
+  return ServiceProvider.get<UserService>('users')
+}
+
 function matchesSearch(user: User, query: string): boolean {
   if (!query) return true
   const searchable = `${user.firstName} ${user.lastName} ${user.maidenName ?? ''} ${user.username} ${user.email}`
@@ -17,7 +21,7 @@ function matchesSearch(user: User, query: string): boolean {
 }
 
 async function list(options: ListOptions): Promise<Page<User>> {
-  const result = await services.users.list(options)
+  const result = await service().list(options)
   for (const user of result.items) cachedUsers.set(user.id, user)
 
   const query = options.query?.trim() ?? ''
@@ -55,13 +59,13 @@ async function getById(id: number, signal?: AbortSignal): Promise<User> {
   const local = createdUsers.get(id) ?? updatedUsers.get(id) ?? cachedUsers.get(id)
   if (local) return local
 
-  const user = await services.users.getById(id, signal)
+  const user = await service().getById(id, signal)
   cachedUsers.set(id, user)
   return user
 }
 
 async function create(input: CreateUserDto): Promise<User> {
-  const response = await services.users.create(input)
+  const response = await service().create(input)
   // DummyJSON повертає один і той самий id для кожного POST; локальні id мають бути унікальними.
   const user = { ...input, ...response, id: nextLocalId-- }
   createdUsers.set(user.id, user)
@@ -78,7 +82,7 @@ async function update(id: number, input: UpdateUserDto): Promise<User> {
     return user
   }
 
-  const response = await services.users.update(id, input)
+  const response = await service().update(id, input)
   const user = { ...current, ...response, ...input, id }
   updatedUsers.set(id, user)
   revision.value += 1
@@ -90,7 +94,7 @@ async function remove(id: number): Promise<void> {
   if (createdUsers.has(id)) {
     createdUsers.delete(id)
   } else {
-    await services.users.delete(id)
+    await service().delete(id)
     deletedUsers.set(id, cachedUsers.get(id) ?? current)
     updatedUsers.delete(id)
     cachedUsers.delete(id)

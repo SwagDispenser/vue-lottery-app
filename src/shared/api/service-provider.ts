@@ -1,15 +1,20 @@
-import { httpClient, type HttpClient } from './http-client'
-import { AuthService } from '@/entities/session'
-import { UserService } from '@/entities/user'
+type Factory<T> = () => T
 
 export class ServiceProvider {
-  readonly users: UserService
-  readonly auth: AuthService
+  private static factories = new Map<string, Factory<unknown>>()
+  private static instances = new Map<string, unknown>()
 
-  constructor(client: HttpClient = httpClient) {
-    this.users = new UserService(client)
-    this.auth = new AuthService(client)
+  static register<T>(key: string, factory: Factory<T>): void {
+    this.factories.set(key, factory)
+    this.instances.delete(key)
+  }
+
+  static get<T>(key: string): T {
+    if (!this.instances.has(key)) {
+      const factory = this.factories.get(key)
+      if (!factory) throw new Error(`Сервіс "${key}" не зареєстровано.`)
+      this.instances.set(key, factory())
+    }
+    return this.instances.get(key) as T
   }
 }
-
-export const services = new ServiceProvider()
