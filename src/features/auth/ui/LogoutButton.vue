@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/entities/session'
+import { useSessionStore } from '@/entities/session'
 
-const auth = useAuthStore()
+const auth = useSessionStore()
 const router = useRouter()
 
 async function logout(): Promise<void> {
-  auth.logout()
+  auth.clearSession()
   await router.replace({ name: 'login' })
 }
 </script>

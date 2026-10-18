@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
 import { AppButton } from '@/shared/ui'
 import { AppModal } from '@/shared/ui'
 import { UserForm } from '@/features/user-form'
 import { UsersTable } from '@/widgets/users-table'
-import { userDirectory } from '@/entities/user'
+import { useUsersStore } from '@/entities/user'
 import type { CreateUserDto, User } from '@/entities/user'
 
 const PAGE_SIZE = 10
 const route = useRoute()
 const router = useRouter()
+const store = useUsersStore()
+const { users, total, isLoading: loading, error, isSaving: saving, mutationError } = storeToRefs(store)
 
 function queryValue(value: unknown): string {
   return typeof value === 'string' ? value : ''
@@ -22,16 +25,8 @@ const page = computed(() => {
 })
 const query = computed(() => queryValue(route.query.q).trim())
 const searchText = ref(query.value)
-const users = ref<User[]>([])
-const total = ref(0)
-const loading = ref(false)
-const error = ref('')
 const createOpen = ref(false)
-const creating = ref(false)
-const createError = ref('')
 const deletingUser = ref<User | null>(null)
-const deleting = ref(false)
-const deleteError = ref('')
 const pageCount = computed(() => Math.max(1, Math.ceil(total.value / PAGE_SIZE)))
 
 watch(query, (value) => {
@@ -51,39 +46,26 @@ watch(searchText, (value, _previous, onCleanup) => {
   onCleanup(() => window.clearTimeout(timer))
 })
 
-watch([page, query, userDirectory.revision], async ([currentPage, currentQuery], _previous, onCleanup) => {
+watch([page, query], async ([currentPage, currentQuery], _previous, onCleanup) => {
   const controller = new AbortController()
   onCleanup(() => controller.abort())
-  loading.value = true
-  error.value = ''
-
-  try {
-    const result = await userDirectory.list({
-      page: currentPage,
-      limit: PAGE_SIZE,
-      query: currentQuery,
-      signal: controller.signal,
-    })
-    if (controller.signal.aborted) return
-
-    users.value = result.items
-    total.value = result.total
-    const lastPage = Math.max(1, Math.ceil(result.total / PAGE_SIZE))
-    if (currentPage > lastPage) {
-      void router.replace({
-        name: 'users',
-        query: { page: lastPage > 1 ? String(lastPage) : undefined, q: currentQuery || undefined },
-      })
-    }
-  } catch (cause) {
-    if (controller.signal.aborted) return
-    users.value = []
-    total.value = 0
-    error.value = cause instanceof Error ? cause.message : 'Не вдалося завантажити користувачів.'
-  } finally {
-    if (!controller.signal.aborted) loading.value = false
-  }
+  await store.fetchUsers({
+    page: currentPage,
+    limit: PAGE_SIZE,
+    query: currentQuery,
+    signal: controller.signal,
+  })
 }, { immediate: true })
+
+// Після видалення останнього запису сторінки повертаємося на доступну сторінку.
+watch([pageCount, loading], ([lastPage, busy]) => {
+  if (!busy && !error.value && page.value > lastPage) {
+    void router.replace({
+      name: 'users',
+      query: { page: lastPage > 1 ? String(lastPage) : undefined, q: query.value || undefined },
+    })
+  }
+})
 
 function goToPage(nextPage: number): void {
   if (nextPage < 1 || nextPage > pageCount.value || nextPage === page.value) return
@@ -93,32 +75,34 @@ function goToPage(nextPage: number): void {
   })
 }
 
+function openCreate(): void {
+  store.clearMutationError()
+  createOpen.value = true
+}
+
+function confirmRemoval(user: User): void {
+  store.clearMutationError()
+  deletingUser.value = user
+}
+
 async function createUser(input: CreateUserDto): Promise<void> {
-  if (creating.value) return
-  creating.value = true
-  createError.value = ''
+  if (saving.value) return
   try {
-    await userDirectory.create(input)
+    await store.createUser(input)
     createOpen.value = false
     if (page.value !== 1 || query.value) await router.push({ name: 'users' })
-  } catch (cause) {
-    createError.value = cause instanceof Error ? cause.message : 'Не вдалося створити користувача.'
-  } finally {
-    creating.value = false
+  } catch {
+    // Store передає помилку у форму; користувач може повторити операцію.
   }
 }
 
 async function deleteUser(): Promise<void> {
-  if (!deletingUser.value || deleting.value) return
-  deleting.value = true
-  deleteError.value = ''
+  if (!deletingUser.value || saving.value) return
   try {
-    await userDirectory.remove(deletingUser.value.id)
+    await store.removeUser(deletingUser.value.id)
     deletingUser.value = null
-  } catch (cause) {
-    deleteError.value = cause instanceof Error ? cause.message : 'Не вдалося видалити користувача.'
-  } finally {
-    deleting.value = false
+  } catch {
+    // При помилці підтвердження залишається відкритим, дані не видаляються.
   }
 }
 </script>
@@ -137,7 +121,7 @@ async function deleteUser(): Promise<void> {
       </div>
       <div class="users-view__heading-actions">
         <span class="users-view__count">Усього: {{ total }}</span>
-        <AppButton @click="createOpen = true">
+        <AppButton @click="openCreate">
           Створити користувача
         </AppButton>
       </div>
@@ -171,7 +155,7 @@ async function deleteUser(): Promise<void> {
       <UsersTable
         :users="users"
         :query="route.query"
-        @delete="deletingUser = $event"
+        @delete="confirmRemoval"
       />
 
       <div class="users-view__pagination">
@@ -202,8 +186,8 @@ async function deleteUser(): Promise<void> {
     @close="createOpen = false"
   >
     <UserForm
-      :busy="creating"
-      :server-error="createError"
+      :busy="saving"
+      :server-error="mutationError"
       submit-label="Створити користувача"
       @save="createUser"
     />
@@ -216,11 +200,11 @@ async function deleteUser(): Promise<void> {
   >
     <p>Видалити {{ deletingUser.firstName }} {{ deletingUser.lastName }} ({{ deletingUser.email }})?</p>
     <p
-      v-if="deleteError"
+      v-if="mutationError"
       class="users-view__error"
       role="alert"
     >
-      {{ deleteError }}
+      {{ mutationError }}
     </p>
     <div class="users-view__confirm-actions">
       <AppButton
@@ -231,10 +215,10 @@ async function deleteUser(): Promise<void> {
       </AppButton>
       <AppButton
         variant="danger"
-        :disabled="deleting"
+        :disabled="saving"
         @click="deleteUser"
       >
-        {{ deleting ? 'Видалення…' : 'Так, видалити' }}
+        {{ saving ? 'Видалення…' : 'Так, видалити' }}
       </AppButton>
     </div>
   </AppModal>

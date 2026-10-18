@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
 import { toTypedSchema } from '@vee-validate/yup'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 import { AppButton } from '@/shared/ui'
 import { ApiError } from '@/shared/api'
-import { useAuthStore } from '@/entities/session'
+import { useSessionStore } from '@/entities/session'
 
 const route = useRoute()
 const router = useRouter()
-const auth = useAuthStore()
+const auth = useSessionStore()
+const { storageError } = storeToRefs(auth)
 const loading = ref(false)
 const loginError = ref('')
 
@@ -87,11 +89,11 @@ const submit = handleSubmit(async (credentials) => {
       </label>
 
       <p
-        v-if="loginError || auth.storageError"
+        v-if="loginError || storageError"
         class="login-view__error"
         role="alert"
       >
-        {{ loginError || auth.storageError }}
+        {{ loginError || storageError }}
       </p>
       <AppButton
         type="submit"

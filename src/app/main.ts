@@ -2,9 +2,9 @@ import './styles/main.scss'
 
 import { createApp } from 'vue'
 import App from './App.vue'
-import { httpClient, registerServices } from './providers/services'
+import { registerServices } from './providers/services'
+import { setupSession } from './providers/session'
 import { router } from './providers/router'
-import { useAuthStore } from '@/entities/session'
 import { pinia } from './providers/pinia'
 
 registerServices()
@@ -12,13 +12,7 @@ registerServices()
 const app = createApp(App)
 app.use(pinia)
 
-const auth = useAuthStore(pinia)
-auth.restoreSession()
-httpClient.setAuthHandlers({
-  getAccessToken: () => auth.accessToken || null,
-  refreshAccessToken: () => auth.refreshAccessToken(),
-  onUnauthorized: () => auth.logout(),
-})
+setupSession()
 
 app.use(router)
 app.mount('#app')

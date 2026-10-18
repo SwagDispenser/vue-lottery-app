@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
-import { useAuthStore } from '@/entities/session'
+import { useSessionStore } from '@/entities/session'
 import { pinia } from '../pinia'
 
 declare module 'vue-router' {
@@ -66,7 +66,7 @@ export const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
-  const auth = useAuthStore(pinia)
+  const auth = useSessionStore(pinia)
   if (to.meta.requiresAuth && !await auth.ensureAuthenticated()) {
     return { name: 'login', query: { redirect: to.fullPath } }
   }

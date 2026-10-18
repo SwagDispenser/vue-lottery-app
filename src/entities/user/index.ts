@@ -1,3 +1,3 @@
 export { UserService } from './api/user.service'
-export { userDirectory } from './model/user-directory'
+export { useUsersStore } from './model/users.store'
 export type { User, UserAddress, UserCompany, UserHair, CreateUserDto, UpdateUserDto } from './model/types'

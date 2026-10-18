@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
-import { useAuthStore } from '@/entities/session'
+import { storeToRefs } from 'pinia'
+import { useSessionStore } from '@/entities/session'
 import { LogoutButton } from '@/features/auth'
 
-const auth = useAuthStore()
+const { isAuthenticated } = storeToRefs(useSessionStore())
 
 const links = [
   { to: '/', label: 'Home' },
@@ -26,7 +27,7 @@ const links = [
     >
       {{ link.label }}
     </RouterLink>
-    <LogoutButton v-if="auth.isAuthenticated" />
+    <LogoutButton v-if="isAuthenticated" />
     <RouterLink
       v-else
       to="/login"
