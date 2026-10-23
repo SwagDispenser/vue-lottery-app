@@ -4,9 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vue Lottery</title>
+    <script>
+      const redirectedRoute = new URLSearchParams(location.search).get('__spa_redirect')
+
+      if (redirectedRoute !== null) {
+        const basePath = location.pathname.endsWith('/') ? location.pathname : `${location.pathname}/`
+        const restoredUrl = new URL(redirectedRoute, `${location.origin}${basePath}`)
+
+        if (restoredUrl.pathname.startsWith(basePath)) {
+          history.replaceState(null, '', restoredUrl.pathname + restoredUrl.search + restoredUrl.hash)
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
+    <script type="module" src="/src/app/main.ts"></script>
   </body>
 </html>
